@@ -59,6 +59,11 @@ class EcranAccueil extends StatelessWidget {
                   style: TextStyle(fontSize: 16, color: Colors.grey),
                 ),
                 SizedBox(height: 32),
+                ElevatedButton.icon(
+                  icon: Icon(Icons.list),
+                  label: Text('Changer de ville'),
+                  onPressed: () {},
+                ),
               ],
             ),
     );
