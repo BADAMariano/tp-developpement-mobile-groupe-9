@@ -3,7 +3,7 @@ import '../models/meteo_data.dart';
 
 class MeteoService {
   // Coordonnees GPS des villes
-  static const Map<String, List<double>> _coords = {
+  static const Map<String, List<double>> coords = {
     'Cotonou': [6.3703, 2.3912],
     'Parakou': [9.3370, 2.6283],
     'Lagos': [6.4541, 3.3947],

@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../viewmodels/ville_viewmodels.dart';
+import '../services/meteo_service.dart';
+import '../services/localisation_service.dart';
 import 'ecran_liste_ville.dart';
 
 class EcranAccueil extends StatelessWidget {
@@ -84,7 +86,6 @@ class EcranAccueil extends StatelessWidget {
                   color: Colors.orange,
                 ),
                 SizedBox(height: 16),
-                // Affichage des vraies donnees meteo
                 Consumer<VilleViewModel>(
                   builder: (context, vm, _) {
                     if (vm.chargement) {
@@ -128,6 +129,39 @@ class EcranAccueil extends StatelessWidget {
                   style: TextStyle(fontSize: 28, color: Colors.grey[700]),
                 ),
                 SizedBox(height: 32),
+                // Bouton GPS
+                ElevatedButton.icon(
+                  icon: Icon(Icons.my_location),
+                  label: Text('Trouver la ville la plus proche'),
+                  onPressed: () async {
+                    final service = LocalisationService();
+                    final position = await service.getPosition();
+
+                    if (position != null) {
+                      final vm = context.read<VilleViewModel>();
+                      final villeProche = service.trouverVilleProche(
+                        position,
+                        vm.villes,
+                        MeteoService.coords,
+                      );
+
+                      if (villeProche != null) {
+                        vm.selectionnerVille(villeProche);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Ville proche : ${villeProche.nom}'),
+                          ),
+                        );
+                      }
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('GPS indisponible')),
+                      );
+                    }
+                  },
+                ),
+                SizedBox(height: 8),
+                // Bouton changer de ville
                 ElevatedButton.icon(
                   onPressed: () {
                     Navigator.push(
