@@ -41,17 +41,48 @@ class EcranAccueil extends StatelessWidget {
                   color: Colors.orange,
                 ),
                 SizedBox(height: 16),
-                Text(
-                  '${ville.temperature.toStringAsFixed(0)} C',
-                  style: TextStyle(fontSize: 60, fontWeight: FontWeight.bold),
+                // Affichage des vraies donnees meteo
+                Consumer<VilleViewModel>(
+                  builder: (context, vm, _) {
+                    if (vm.chargement) {
+                      return CircularProgressIndicator();
+                    }
+                    if (vm.erreur != null) {
+                      return Column(
+                        children: [
+                          Icon(Icons.wifi_off, size: 60, color: Colors.red),
+                          Text(vm.erreur!, style: TextStyle(color: Colors.red)),
+                          ElevatedButton(
+                            onPressed: () =>
+                                vm.selectionnerVille(vm.villeSelectionnee!),
+                            child: Text('Reessayer'),
+                          ),
+                        ],
+                      );
+                    }
+                    final meteo = vm.meteoActuelle;
+                    if (meteo == null) return Text('Chargement...');
+
+                    return Column(
+                      children: [
+                        Text(
+                          '${meteo.temperature.toStringAsFixed(1)} C',
+                          style: TextStyle(
+                            fontSize: 60,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          '${meteo.conditionTexte} - ${meteo.humidite}% humidite',
+                        ),
+                      ],
+                    );
+                  },
                 ),
+                SizedBox(height: 16),
                 Text(
                   ville.nom,
                   style: TextStyle(fontSize: 28, color: Colors.grey[700]),
-                ),
-                Text(
-                  '${ville.condition} - Humidite : ${ville.humidite}%',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
                 ),
                 SizedBox(height: 32),
                 ElevatedButton.icon(
