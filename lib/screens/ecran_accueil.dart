@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import '../viewmodels/ville_viewmodels.dart';
 import 'ecran_liste_ville.dart';
 
@@ -35,6 +37,47 @@ class EcranAccueil extends StatelessWidget {
           : Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // Bouton photo
+                GestureDetector(
+                  onTap: () async {
+                    final picker = ImagePicker();
+                    final XFile? image = await picker.pickImage(
+                      source: ImageSource.gallery,
+                    );
+                    if (image != null) {
+                      context.read<VilleViewModel>().mettreAJourPhoto(
+                        image.path,
+                      );
+                    }
+                  },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: vm.villeSelectionnee?.photoPath != null
+                        ? Image.file(
+                            File(vm.villeSelectionnee!.photoPath!),
+                            width: double.infinity,
+                            height: 200,
+                            fit: BoxFit.cover,
+                          )
+                        : Container(
+                            width: double.infinity,
+                            height: 200,
+                            color: Colors.grey[200],
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.add_a_photo,
+                                  size: 50,
+                                  color: Colors.grey,
+                                ),
+                                Text('Appuyez pour ajouter une photo'),
+                              ],
+                            ),
+                          ),
+                  ),
+                ),
+                SizedBox(height: 16),
                 Icon(
                   _iconeMeteo(ville.condition),
                   size: 100,
