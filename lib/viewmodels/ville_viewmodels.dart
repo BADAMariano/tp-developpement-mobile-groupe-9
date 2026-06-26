@@ -67,4 +67,19 @@ class VilleViewModel extends ChangeNotifier {
     _chargement = false;
     notifyListeners();
   }
+
+  // Mettre a jour la photo de la ville selectionnee
+  void mettreAJourPhoto(String cheminPhoto) {
+    if (_villeSelectionnee == null) return;
+
+    // Trouver l'index de la ville dans la liste
+    final index = _villes.indexWhere((v) => v.nom == _villeSelectionnee!.nom);
+    if (index == -1) return;
+
+    // Creer une copie avec la nouvelle photo
+    _villes[index] = _villes[index].copierAvecPhoto(cheminPhoto);
+    _villeSelectionnee = _villes[index];
+
+    notifyListeners(); // prevenir les widgets
+  }
 }
