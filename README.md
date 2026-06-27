@@ -8,7 +8,7 @@ Application meteo AppMeteo - TP UE2
 | 2 | BLEOSSI De-vilpin |Rapporteur           |
 | 3 | BOCOVO Casimir    | Developpeur         |
 | 4 | AKOGBE Gédeon     | Deveoloppeur        |
-| 5 | DENAKPO Hyacynthe | Developpeur         |
+| 5 | DENAKPO Hyacinthe | Developpeur         |
 | 6 | WINSOU Bernard    | Developpeur         |
 | 7 | WETA Ortave       | Developpeur         |
 
