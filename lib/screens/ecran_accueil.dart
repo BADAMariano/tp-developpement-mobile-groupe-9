@@ -150,20 +150,29 @@ class _EcranAccueilState extends State<EcranAccueil> {
                                 ],
                               );
                             }
-                            final meteo = vm.meteoActuelle;
-                            if (meteo == null) return Text('Chargement...');
 
                             return Column(
                               children: [
-                                Text(
-                                  '${meteo.temperature.toStringAsFixed(1)} C',
-                                  style: TextStyle(
-                                    fontSize: 60,
-                                    fontWeight: FontWeight.bold,
+                                // AnimatedSwitcher sur la temperature
+                                AnimatedSwitcher(
+                                  duration: Duration(milliseconds: 400),
+                                  transitionBuilder: (child, animation) {
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: child,
+                                    );
+                                  },
+                                  child: Text(
+                                    '${vm.meteoActuelle?.temperature.toStringAsFixed(1) ?? '--'} C',
+                                    key: ValueKey(vm.villeSelectionnee?.nom),
+                                    style: TextStyle(
+                                      fontSize: 60,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
                                 Text(
-                                  '${meteo.conditionTexte} - ${meteo.humidite}% humidite',
+                                  '${vm.meteoActuelle?.conditionTexte ?? ''} - ${vm.meteoActuelle?.humidite ?? '--'}% humidite',
                                 ),
                               ],
                             );
