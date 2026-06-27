@@ -32,7 +32,7 @@ class MeteoService {
 
   // Recuperer la meteo d'une ville
   Future<MeteoData?> getMeteo(String nomVille) async {
-    final coords = _coords[nomVille];
+    final coords = MeteoService.coords[nomVille];
     if (coords == null) {
       print('Ville inconnue : $nomVille');
       return null;

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../models/ville.dart';
 import '../services/meteo_service.dart';
 import '../models/meteo_data.dart';
@@ -61,6 +62,7 @@ class VilleViewModel extends ChangeNotifier {
 
     if (meteo != null) {
       _meteoActuelle = meteo;
+      await _verifierAlerteChaleur();
     } else {
       _erreur = 'Impossible de charger la meteo';
     }
@@ -72,14 +74,34 @@ class VilleViewModel extends ChangeNotifier {
   void mettreAJourPhoto(String cheminPhoto) {
     if (_villeSelectionnee == null) return;
 
-    // Trouver l'index de la ville dans la liste
     final index = _villes.indexWhere((v) => v.nom == _villeSelectionnee!.nom);
     if (index == -1) return;
 
-    // Creer une copie avec la nouvelle photo
     _villes[index] = _villes[index].copierAvecPhoto(cheminPhoto);
     _villeSelectionnee = _villes[index];
 
-    notifyListeners(); // prevenir les widgets
+    notifyListeners();
+  }
+
+  // Envoyer une notification si temperature > 33°C
+  Future<void> _verifierAlerteChaleur() async {
+    if (_meteoActuelle == null) return;
+    if (_meteoActuelle!.temperature > 33) {
+      final plugin = FlutterLocalNotificationsPlugin();
+
+      const AndroidNotificationDetails details = AndroidNotificationDetails(
+        'canal_alerte',
+        'Alertes Meteo',
+        importance: Importance.high,
+        priority: Priority.high,
+      );
+
+      await plugin.show(
+        1,
+        'Alerte chaleur !',
+        'Il fait ${_meteoActuelle!.temperature.toStringAsFixed(0)} C a ${_villeSelectionnee!.nom}',
+        NotificationDetails(android: details),
+      );
+    }
   }
 }
