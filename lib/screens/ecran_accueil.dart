@@ -6,6 +6,7 @@ import '../viewmodels/ville_viewmodels.dart';
 import '../services/meteo_service.dart';
 import '../services/localisation_service.dart';
 import 'ecran_liste_ville.dart';
+import 'ecran_detail_ville.dart';
 
 class EcranAccueil extends StatefulWidget {
   const EcranAccueil({super.key});
@@ -20,10 +21,22 @@ class _EcranAccueilState extends State<EcranAccueil> {
   @override
   void initState() {
     super.initState();
-    // Demarrer l'animation apres 300 ms
     Future.delayed(Duration(milliseconds: 300), () {
       if (mounted) setState(() => _visible = true);
     });
+  }
+
+  IconData _iconeMeteo(String condition) {
+    switch (condition) {
+      case 'Ensoleille':
+        return Icons.wb_sunny;
+      case 'Nuageux':
+        return Icons.cloud;
+      case 'Pluvieux':
+        return Icons.umbrella;
+      default:
+        return Icons.wb_cloudy;
+    }
   }
 
   @override
@@ -87,56 +100,85 @@ class _EcranAccueilState extends State<EcranAccueil> {
                     ),
                   ),
                   SizedBox(height: 16),
-                  Icon(
-                    _iconeMeteo(ville.condition),
-                    size: 100,
-                    color: Colors.orange,
-                  ),
-                  SizedBox(height: 16),
-                  Consumer<VilleViewModel>(
-                    builder: (context, vm, _) {
-                      if (vm.chargement) {
-                        return CircularProgressIndicator();
-                      }
-                      if (vm.erreur != null) {
-                        return Column(
-                          children: [
-                            Icon(Icons.wifi_off, size: 60, color: Colors.red),
-                            Text(
-                              vm.erreur!,
-                              style: TextStyle(color: Colors.red),
-                            ),
-                            ElevatedButton(
-                              onPressed: () =>
-                                  vm.selectionnerVille(vm.villeSelectionnee!),
-                              child: Text('Reessayer'),
-                            ),
-                          ],
-                        );
-                      }
-                      final meteo = vm.meteoActuelle;
-                      if (meteo == null) return Text('Chargement...');
-
-                      return Column(
-                        children: [
-                          Text(
-                            '${meteo.temperature.toStringAsFixed(1)} C',
-                            style: TextStyle(
-                              fontSize: 60,
-                              fontWeight: FontWeight.bold,
-                            ),
+                  // Hero + infos meteo avec navigation vers detail
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => EcranDetailVille(
+                            ville: vm.villeSelectionnee!,
+                            meteo: vm.meteoActuelle,
                           ),
-                          Text(
-                            '${meteo.conditionTexte} - ${meteo.humidite}% humidite',
-                          ),
-                        ],
+                        ),
                       );
                     },
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    ville.nom,
-                    style: TextStyle(fontSize: 28, color: Colors.grey[700]),
+                    child: Column(
+                      children: [
+                        Hero(
+                          tag: 'icone-${vm.villeSelectionnee?.nom ?? "meteo"}',
+                          child: Icon(
+                            _iconeMeteo(vm.villeSelectionnee?.condition ?? ''),
+                            size: 100,
+                            color: Colors.orange,
+                          ),
+                        ),
+                        SizedBox(height: 16),
+                        Consumer<VilleViewModel>(
+                          builder: (context, vm, _) {
+                            if (vm.chargement) {
+                              return CircularProgressIndicator();
+                            }
+                            if (vm.erreur != null) {
+                              return Column(
+                                children: [
+                                  Icon(
+                                    Icons.wifi_off,
+                                    size: 60,
+                                    color: Colors.red,
+                                  ),
+                                  Text(
+                                    vm.erreur!,
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () => vm.selectionnerVille(
+                                      vm.villeSelectionnee!,
+                                    ),
+                                    child: Text('Reessayer'),
+                                  ),
+                                ],
+                              );
+                            }
+                            final meteo = vm.meteoActuelle;
+                            if (meteo == null) return Text('Chargement...');
+
+                            return Column(
+                              children: [
+                                Text(
+                                  '${meteo.temperature.toStringAsFixed(1)} C',
+                                  style: TextStyle(
+                                    fontSize: 60,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  '${meteo.conditionTexte} - ${meteo.humidite}% humidite',
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          ville.nom,
+                          style: TextStyle(
+                            fontSize: 28,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   SizedBox(height: 32),
                   // Bouton GPS
@@ -188,18 +230,5 @@ class _EcranAccueilState extends State<EcranAccueil> {
               ),
       ),
     );
-  }
-
-  IconData _iconeMeteo(String condition) {
-    switch (condition) {
-      case 'Ensoleille':
-        return Icons.wb_sunny;
-      case 'Nuageux':
-        return Icons.cloud;
-      case 'Pluvieux':
-        return Icons.umbrella;
-      default:
-        return Icons.wb_cloudy;
-    }
   }
 }
